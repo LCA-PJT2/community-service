@@ -2,8 +2,7 @@
 def APP_NAME
 def APP_VERSION
 def DOCKER_IMAGE_NAME
-def PROD_BUILD = false
-def TAG_BUILD = false
+
 pipeline {
     agent {
         node {
@@ -11,22 +10,8 @@ pipeline {
         }
     }
 
-    parameters {
-        gitParameter branch: '',
-                    branchFilter: '.*',
-                    defaultValue: 'origin/main',
-                    description: '', listSize: '0',
-                    name: 'TAG',
-                    quickFilterEnabled: false,
-                    selectedValue: 'DEFAULT',
-                    sortMode: 'DESCENDING_SMART',
-                    tagFilter: '*',
-                    type: 'PT_BRANCH_TAG'
-
-        booleanParam defaultValue: false, description: '', name: 'RELEASE'
-    }
-
     environment {
+        GIT_REF = "${params.GIT_REF ?: ''}"
         GIT_URL = "https://github.com/LCA-PJT2/community-service.git"
         GITHUB_CREDENTIAL = "github-token"
         ARTIFACTS = "build/libs/**"
@@ -47,34 +32,38 @@ pipeline {
     }
 
     stages {
+        stage('Check Branch') {
+            steps {
+                script {
+                    echo "Webhook ref: ${GIT_REF}"
+
+                    if (!GIT_REF.endsWith('/main')) {
+                        echo "⛔️ Not main branch (${GIT_REF}), skipping pipeline."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
+        }
+
         stage('Set Version') {
             steps {
                 script {
-                    APP_NAME = sh (
-                            script: "gradle -q getAppName",
-                            returnStdout: true
+                    APP_NAME = sh(
+                        script: "grep rootProject.name settings.gradle | cut -d \"'\" -f2",
+                        returnStdout: true
                     ).trim()
-                    APP_VERSION = sh (
-                            script: "gradle -q getAppVersion",
-                            returnStdout: true
+
+                    APP_VERSION = sh(
+                        script: "grep '^version' build.gradle | cut -d \"'\" -f2",
+                        returnStdout: true
                     ).trim()
 
                     DOCKER_IMAGE_NAME = "${DOCKER_REGISTRY}/${APP_NAME}:${APP_VERSION}"
 
-                    sh "echo IMAGE_NAME is ${APP_NAME}"
-                    sh "echo IMAGE_VERSION is ${APP_VERSION}"
-                    sh "echo DOCKER_IMAGE_NAME is ${DOCKER_IMAGE_NAME}"
-
-                    sh "echo TAG is ${params.TAG}"
-                    if( params.TAG.startsWith('origin') == false && params.TAG.endsWith('/main') == false ) {
-                        if( params.RELEASE == true ) {
-                            DOCKER_IMAGE_NAME += '-RELEASE'
-                            PROD_BUILD = true
-                        } else {
-                            DOCKER_IMAGE_NAME += '-TAG'
-                            TAG_BUILD = true
-                        }
-                    }
+                    echo "✅ IMAGE_NAME: ${APP_NAME}"
+                    echo "✅ IMAGE_VERSION: ${APP_VERSION}"
+                    echo "✅ DOCKER_IMAGE_NAME: ${DOCKER_IMAGE_NAME}"
                 }
             }
         }
@@ -86,20 +75,14 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-//             when {
-//                 expression { PROD_BUILD == true || TAG_BUILD == true }
-//             }
             steps {
                 script {
-                    docker.build "${DOCKER_IMAGE_NAME}"
+                    docker.build("${DOCKER_IMAGE_NAME}")
                 }
             }
         }
 
         stage('Push Docker Image') {
-//             when {
-//                 expression { PROD_BUILD == true || TAG_BUILD == true }
-//             }
             steps {
                 script {
                     docker.withRegistry("", DOCKERHUB_CREDENTIAL) {
