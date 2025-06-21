@@ -11,7 +11,6 @@ pipeline {
     }
 
     environment {
-        GIT_REF = "${params.GIT_REF ?: ''}"
         GIT_URL = "https://github.com/LCA-PJT2/community-service.git"
         GITHUB_CREDENTIAL = "github-token"
         ARTIFACTS = "build/libs/**"
@@ -35,10 +34,11 @@ pipeline {
         stage('Check Branch') {
             steps {
                 script {
-                    echo "Webhook ref: ${GIT_REF}"
+                    def ref = env.GIT_REF ?: ''
+                    echo "Webhook ref: ${ref}"
 
-                    if (!GIT_REF.endsWith('/main')) {
-                        echo "⛔️ Not main branch (${GIT_REF}), skipping pipeline."
+                    if (!ref.endsWith('/main')) {
+                        echo "⛔️ Not main branch (${ref}), skipping pipeline."
                         currentBuild.result = 'SUCCESS'
                         return
                     }
