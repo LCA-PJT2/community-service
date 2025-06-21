@@ -99,7 +99,7 @@ pipeline {
         stage('Update Deployment Manifest & Git Push') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_TOKEN')]) {
                         sh """
                         # 1. 클린업 및 GitOps 저장소 clone
                         rm -rf app-config
