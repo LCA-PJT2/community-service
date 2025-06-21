@@ -17,8 +17,8 @@ pipeline {
         DOCKER_REGISTRY = "suhyunkim7288"
         DOCKERHUB_CREDENTIAL = 'dockerhub-token'
 
-        DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/your_webhook_url_here'
-        APP_CONFIG_REPO = "https://<token>@github.com/your-org/infra-repo.git"
+//         DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/your_webhook_url_here'
+//         APP_CONFIG_REPO = "https://<token>@github.com/your-org/infra-repo.git"
     }
 
     options {
@@ -99,7 +99,7 @@ pipeline {
         stage('Update Deployment Manifest & Git Push') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'GITHUB_CREDENTIAL', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                         sh """
                         # 1. 클린업 및 GitOps 저장소 clone
                         rm -rf app-config
