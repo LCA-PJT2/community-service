@@ -11,6 +11,7 @@ pipeline {
     }
 
     environment {
+        GIT_REF = "${params.GIT_REF ?: ''}"
         GIT_URL = "https://github.com/LCA-PJT2/community-service.git"
         GITHUB_CREDENTIAL = "github-token"
         ARTIFACTS = "build/libs/**"
@@ -34,11 +35,10 @@ pipeline {
         stage('Check Branch') {
             steps {
                 script {
-                    def branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-                    echo "현재 브랜치: ${branchName}"
+                    echo "Webhook ref: ${GIT_REF}"
 
-                    if (branchName != 'main') {
-                        echo "⛔ '${branchName}' 브랜치에서는 파이프라인을 실행하지 않음."
+                    if (!GIT_REF.endsWith('/main')) {
+                        echo "⛔️ Not main branch (${GIT_REF}), skipping pipeline."
                         currentBuild.result = 'SUCCESS'
                         return
                     }
