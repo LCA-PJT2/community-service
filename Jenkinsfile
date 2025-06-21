@@ -16,6 +16,9 @@ pipeline {
         ARTIFACTS = "build/libs/**"
         DOCKER_REGISTRY = "suhyunkim7288"
         DOCKERHUB_CREDENTIAL = 'dockerhub-token'
+
+        DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/your_webhook_url_here'
+        APP_CONFIG_REPO = "https://<token>@github.com/your-org/infra-repo.git"
     }
 
     options {
@@ -89,6 +92,32 @@ pipeline {
                         docker.image("${DOCKER_IMAGE_NAME}").push()
                     }
                     sh "docker rmi ${DOCKER_IMAGE_NAME}"
+                }
+            }
+        }
+
+        stage('Update Deployment Manifest & Git Push') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'GITHUB_CREDENTIAL', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                        # 1. 클린업 및 GitOps 저장소 clone
+                        rm -rf app-config
+                        git clone https://${GITHUB_TOKEN}@github.com/LCA-PJT2/app-config.git
+
+                        cd app-config
+
+                        # 2. image 태그 자동 업데이트
+                        sed -i 's|image: suhyunkim7288/${APP_NAME}:.*|image: suhyunkim7288/${APP_NAME}:${APP_VERSION}|' community-service/prd/community-service-deploy.yml
+
+                        # 3. Git 커밋 및 푸시
+                        git config user.name "SuHyunKKim"
+                        git config user.email "kimsteven728@dgu.ac.kr"
+                        git add community-service/prd/community-service-deploy.yml
+                        git commit -m "🔁 update image tag to ${APP_VERSION}"
+                        git push origin main
+                        """
+                    }
                 }
             }
         }
