@@ -1,9 +1,11 @@
 package com.backend.communityservice.common.web.context;
 
 import com.backend.communityservice.common.exception.NotFound;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+@Component
 public class GatewayRequestHeaderUtils {
     public static String getRequestHeaderParamAsString(String key) {
         ServletRequestAttributes requestAttributes =

@@ -1,9 +1,10 @@
 package com.backend.communityservice.advice;
 
-import com.backend.communityservice.common.dto.ApiResponseDto;
+import com.backend.communityservice.common.domain.dto.ApiResponseDto;
 import com.backend.communityservice.common.exception.BadParameter;
 import com.backend.communityservice.common.exception.ClientError;
 import com.backend.communityservice.common.exception.NotFound;
+import com.backend.communityservice.common.exception.Unauthorized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,16 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Order(value = 1)
 @RestControllerAdvice
 public class ApiCommonAdvice {
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({Unauthorized.class})
+    public ApiResponseDto<String> handleBadParameter(Unauthorized e) {
+        e.printStackTrace();
+        return ApiResponseDto.createError(
+                e.getErrorCode(),
+                e.getErrorMessage()
+        );
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({BadParameter.class})

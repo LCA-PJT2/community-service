@@ -1,6 +1,6 @@
 package com.backend.communityservice.api.backend;
 
-import com.backend.communityservice.common.dto.ApiResponseDto;
+import com.backend.communityservice.common.domain.dto.ApiResponseDto;
 import com.backend.communityservice.service.probe.ProbeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
