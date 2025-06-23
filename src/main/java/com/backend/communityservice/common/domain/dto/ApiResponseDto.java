@@ -1,4 +1,4 @@
-package com.backend.communityservice.common.dto;
+package com.backend.communityservice.common.domain.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
