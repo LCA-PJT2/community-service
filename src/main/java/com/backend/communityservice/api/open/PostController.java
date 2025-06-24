@@ -48,8 +48,8 @@ public class PostController {
     public ApiResponseDto<PostCreateResponse> createPost(@RequestBody PostRequest.PostCreateRequest postCreateRequest) {
     
         // gateway header에서 userId 받아옴
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         // postcreate 서비스 호출
         PostCreateResponse createResponse = postService.createPost(postCreateRequest, userId);
@@ -63,8 +63,8 @@ public class PostController {
                                                          @RequestBody PostRequest.PostUpdateRequest postUpdateRequest) {
 
         // gateway header에서 userId 받아옴
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         PostUpdateResponse updateResponse = postService.updatePost(postUpdateRequest, postId, userId);
 
@@ -75,8 +75,8 @@ public class PostController {
     public ApiResponseDto<?> deletePost(@PathVariable Long postId) {
 
         // gateway header에서 userId 받아옴
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         postService.deletePost(postId, userId);
 

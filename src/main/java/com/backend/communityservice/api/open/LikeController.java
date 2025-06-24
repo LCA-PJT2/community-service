@@ -24,8 +24,8 @@ public class LikeController {
     @PostMapping("/{commentId}/like")
     public ApiResponseDto<LikeResponse> toggleLike(@PathVariable("commentId") Long commentId) {
 
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         LikeResponse response = likeService.toggleLike(commentId, userId);
 
