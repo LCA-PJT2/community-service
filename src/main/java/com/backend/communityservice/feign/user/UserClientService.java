@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "auth-service",
-//            url = "http://user-service:8080",
+            url = "http://auth-service-service:8080",
             // TODO: user service api 넣기
             path = "/api/auth/v1/user")
 public interface UserClientService {
