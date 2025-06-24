@@ -16,6 +16,8 @@ import com.backend.communityservice.domain.repository.PostRepository;
 import com.backend.communityservice.event.KafkaMessageProducer;
 //import com.backend.communityservice.feign.csquestion.CSQuestionClientService;
 //import com.backend.communityservice.feign.user.UserClientService;
+import com.backend.communityservice.feign.csquestion.CSQuestionClientService;
+import com.backend.communityservice.feign.user.UserClientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +28,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -37,18 +36,32 @@ import java.util.Map;
 public class PostService {
 
     private final PostRepository postRepository;
-//    private final CSQuestionClientService csQuestionClientService;
+    private final CSQuestionClientService csQuestionClientService;
     private final KafkaMessageProducer kafkaMessageProducer;
-//    private final UserClientService userClientService;
+    private final UserClientService userClientService;
+
+    @Transactional
+    public void deleteEverythingByUserId(String userId) {
+
+        List<Post> posts = postRepository.findByUserId(userId);
+
+        if (posts.isEmpty()) {
+            throw new NotFound("삭제할 게시글이 존재하지 않습니다.");
+        }
+
+        postRepository.deleteAll(posts);
+
+    }
+
 
     public PostCreateResponse createPost(PostRequest.PostCreateRequest requestDto,
                                          String userId) {
 
 //        String csQuestionId = "";
         if (requestDto.getQuestionId() != null) {
-//            boolean questionExists = csQuestionClientService.existsById(requestDto.getQuestionId());
+            boolean questionExists = csQuestionClientService.existsById((Long.parseLong(requestDto.getQuestionId())));
 
-            boolean questionExists = true; // 👉 항상 존재한다고 가정
+//            boolean questionExists = true; // 👉 항상 존재한다고 가정
 
             if (!questionExists) {
                 throw new NotFound("질문이 존재하지 않습니다.");
@@ -88,8 +101,8 @@ public class PostService {
         }
 
         if (requestDto.getQuestionId() != null) {
-//            boolean questionExists = csQuestionClientService.existsById(requestDto.getQuestionId());
-            boolean questionExists = true; // 👉 항상 존재한다고 가정
+            boolean questionExists = csQuestionClientService.existsById((Long.parseLong(requestDto.getQuestionId())));
+//            boolean questionExists = true; // 👉 항상 존재한다고 가정
 
             if (!questionExists) {
                 throw new NotFound("질문이 존재하지 않아요.");
@@ -139,11 +152,11 @@ public class PostService {
                 .distinct()
                 .toList();
 
-//        Map<String, String> userMap = userClientService.getUsernames(userIds);
+        Map<String, String> userMap = userClientService.getUsernames(userIds);
 
-        // 하드코딩된 userMap 생성 (userId → username)
-        Map<String, String> userMap = new HashMap<>();
-        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
+//        // 하드코딩된 userMap 생성 (userId → username)
+//        Map<String, String> userMap = new HashMap<>();
+//        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
 
         return PostListResponse.fromPosts(posts, userMap);
     }
@@ -160,11 +173,11 @@ public class PostService {
                 .distinct()
                 .toList();
 
-//        Map<String, String> userMap = userClientService.getUsernames(userIds);
+        Map<String, String> userMap = userClientService.getUsernames(userIds);
 
         // 하드코딩된 userMap 생성 (userId → username)
-        Map<String, String> userMap = new HashMap<>();
-        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
+//        Map<String, String> userMap = new HashMap<>();
+//        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
 
         return PostListResponse.fromPosts(posts, userMap);
     }
@@ -175,9 +188,9 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFound("게시글을 찾을수 없습니다."));
 
-//        String username = userClientService.getUserInfo(post.getUserId()).getUserName();
+        String username = userClientService.getUserInfo(post.getUserId()).getUserName();
 
-        String username = "김수현";
+//        String username = "김수현";
 
         return PostDetailResponse.fromEntity(post, username);
     }

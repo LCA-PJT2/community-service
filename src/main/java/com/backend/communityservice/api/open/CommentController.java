@@ -28,9 +28,9 @@ public class CommentController {
     public ApiResponseDto<CommentResponse.CommentCreateResponse> addComment(@PathVariable Long postId,
                                                       @RequestBody CommentRequest.CommentCreateRequest commentCreateRequest) {
 
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
 
-        String userId = "1";
+//        String userId = "1";
 
         var response = commentService.addComment(postId, userId, commentCreateRequest);
 
@@ -42,8 +42,8 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestBody CommentRequest.CommentUpdateRequest commentUpdateRequest) {
 
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         var response = commentService.updateComment(commentId, userId, commentUpdateRequest);
 
@@ -53,8 +53,8 @@ public class CommentController {
     @PostMapping("/delete/{commentId}")
     public ApiResponseDto<?> deleteComment(@PathVariable Long commentId) {
 
-//        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
-        String userId = "1";
+        String userId = GatewayRequestHeaderUtils.getUserIdOrThrowException();
+//        String userId = "1";
 
         commentService.deleteComment(commentId, userId);
 

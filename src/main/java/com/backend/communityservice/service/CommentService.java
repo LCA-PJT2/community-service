@@ -11,7 +11,7 @@ import com.backend.communityservice.domain.repository.CommentRepository;
 import com.backend.communityservice.domain.repository.LikeRepository;
 import com.backend.communityservice.domain.repository.PostRepository;
 import com.backend.communityservice.event.KafkaMessageProducer;
-//import com.backend.communityservice.feign.user.UserClientService;
+import com.backend.communityservice.feign.user.UserClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final KafkaMessageProducer kafkaMessageProducer;
-//    private final UserClientService userClientService;
+    private final UserClientService userClientService;
     private final LikeRepository likeRepository;
 
     public CommentResponse.CommentListResponse getCommentList(Long postId) {
@@ -44,11 +44,11 @@ public class CommentService {
                 .distinct()
                 .toList();
 
-//        Map<String, String> userMap = userClientService.getUsernames(userIds);
+        Map<String, String> userMap = userClientService.getUsernames(userIds);
 
         // 하드코딩된 userMap 생성 (userId → username)
-        Map<String, String> userMap = new HashMap<>();
-        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
+//        Map<String, String> userMap = new HashMap<>();
+//        userMap.put("1", "테스트유저"); // userId "1" → 닉네임 "테스트유저"
         
         return CommentResponse.CommentListResponse.fromComments(comments, userMap);
     }
