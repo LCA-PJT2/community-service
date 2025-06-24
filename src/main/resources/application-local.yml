@@ -21,3 +21,9 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+
