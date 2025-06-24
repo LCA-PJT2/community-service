@@ -26,10 +26,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -40,6 +37,22 @@ public class PostService {
 //    private final CSQuestionClientService csQuestionClientService;
     private final KafkaMessageProducer kafkaMessageProducer;
 //    private final UserClientService userClientService;
+
+    @Transactional
+    public void deleteEverythingByUserId(String userId) {
+
+        List<Post> posts = postRepository.findByUserId(userId);
+
+        if (posts.isEmpty()) {
+            throw new NotFound("삭제할 게시글이 존재하지 않습니다.");
+        }
+
+        for (Post post : posts) {
+            postRepository.delete(post);
+        }
+
+    }
+
 
     public PostCreateResponse createPost(PostRequest.PostCreateRequest requestDto,
                                          String userId) {
